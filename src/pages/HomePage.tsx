@@ -5,6 +5,7 @@ import VideoIntro from '../components/sections/VideoIntro/VideoIntro';
 import Features from '../components/sections/Features/Features';
 import Testimonials from '../components/sections/Testimonials/Testimonials';
 import CTA from '../components/sections/CTA/CTA';
+import FloatingChat from '../components/shared/FloatingChat';
 
 export default function HomePage() {
   return (
@@ -18,6 +19,7 @@ export default function HomePage() {
         <CTA />
       </main>
       <Footer />
+      <FloatingChat />
     </div>
   );
 }
