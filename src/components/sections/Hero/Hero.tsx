@@ -21,10 +21,10 @@ export default function Hero() {
               <span>Top Rated English Tutor</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold leading-tight mb-6 md:mb-8 flex flex-col items-center lg:items-start">
-              <span className="block">Master English</span>
-              <span className="block">with</span>
-              <span className="block h-[1.5em] relative w-full flex justify-center lg:justify-start mt-2 md:mt-4">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 md:mb-8 flex flex-col items-center lg:items-start">
+              <span className="block opacity-95 mb-1 lg:mb-2 text-navy/80">Master English</span>
+              <span className="block text-navy">with</span>
+              <span className="block h-[1.3em] relative w-full flex justify-center lg:justify-start mt-2 md:mt-4 whitespace-nowrap">
                 <AnimatePresence mode="wait">
                   <motion.span
                     key={currentWordIndex}
@@ -32,7 +32,7 @@ export default function Hero() {
                     animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
                     exit={{ opacity: 0, y: -30, scale: 1.1, filter: 'blur(8px)' }}
                     transition={{ duration: 0.5, ease: 'easeOut' }}
-                    className="bg-red text-navy px-4 py-1 md:px-6 md:py-2 rounded-xl md:rounded-2xl inline-block absolute shadow-lg max-w-[90vw] sm:max-w-full"
+                    className="bg-red text-navy px-3 py-1 md:px-5 md:py-1.5 rounded-xl md:rounded-2xl inline-block absolute shadow-lg"
                   >
                     {heroWords[currentWordIndex]}
                   </motion.span>
