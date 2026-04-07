@@ -2,13 +2,17 @@ import { AnimatePresence, motion } from 'motion/react';
 import { ArrowRight, Award, CheckCircle2, Star, Users } from 'lucide-react';
 import { heroImages, heroWords } from './hero.data';
 import { useRotatingWords } from './useRotatingWords';
+import SectionBadge from '../../shared/SectionBadge';
 
 export default function Hero() {
   const currentWordIndex = useRotatingWords(heroWords.length, 3000);
 
   return (
-    <section id="home" className="pt-24 pb-7 md:pt-28 md:pb-12 lg:pt-32 lg:pb-16 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+    <section
+      id="home"
+      className="h-[100svh] max-h-[100svh] box-border pt-[calc(var(--navbar-height)+1rem)] pb-7 md:pb-10 overflow-hidden flex items-center"
+    >
+      <div className="w-[90%] max-w-[1400px] mx-auto">
         <div className="flex flex-col lg:flex-row items-center gap-5 lg:gap-7">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -16,10 +20,7 @@ export default function Hero() {
             transition={{ duration: 0.6 }}
             className="flex-1 text-center lg:text-left w-full"
           >
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-red/30 text-navy font-medium text-xs md:text-sm mb-4 md:mb-6">
-              <Star size={16} className="fill-navy" />
-              <span>Top Rated English Tutor</span>
-            </div>
+            <SectionBadge icon={<Star size={14} />} label="Top Rated English Tutor" />
 
             <h1 className="text-[1.95rem] sm:text-[2.35rem] md:text-[2.9rem] lg:text-[3.6rem] font-extrabold leading-tight mb-4 md:mb-6 flex flex-col items-center lg:items-start">
               <span className="block opacity-95 mb-1 lg:mb-2 text-navy/80">Master English</span>

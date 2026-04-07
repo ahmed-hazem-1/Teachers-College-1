@@ -13,11 +13,7 @@ export default function Testimonials() {
         <div className="mb-12">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <SectionBadge
-              icon={
-                <div className="w-6 h-6 bg-red rounded-full flex items-center justify-center">
-                  <MessageSquareQuote size={12} className="text-navy" />
-                </div>
-              }
+              icon={<MessageSquareQuote size={14} />}
               label="Testimonials"
             />
           </motion.div>

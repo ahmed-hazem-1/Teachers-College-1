@@ -3,6 +3,7 @@ import { BookOpen, Calendar, Globe, MessageCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { features } from './features.data';
 import type { FeatureItem } from '../../../types/content';
+import SectionBadge from '../../shared/SectionBadge';
 
 const featureIcons = {
   conversation: MessageCircle,
@@ -46,6 +47,14 @@ export default function Features() {
     <section id="methodology" className="py-12 md:py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex justify-center"
+          >
+            <SectionBadge icon={<BookOpen size={14} />} label="Methodology" />
+          </motion.div>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

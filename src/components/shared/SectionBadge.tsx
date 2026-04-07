@@ -14,12 +14,14 @@ export default function SectionBadge({ icon, label, className }: SectionBadgePro
   return (
     <div
       className={joinClasses(
-        'inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-gray-100 shadow-sm mb-6',
+        'inline-flex items-center gap-2.5 px-3.5 py-2 rounded-full bg-white border border-gray-200 shadow-[0_10px_22px_-14px_rgba(0,0,0,0.35)] mb-4 md:mb-6',
         className,
       )}
     >
-      {icon}
-      <span className="text-sm font-medium text-gray-700">{label}</span>
+      <span className="w-7 h-7 rounded-full bg-red flex items-center justify-center text-navy flex-shrink-0">
+        {icon}
+      </span>
+      <span className="text-sm md:text-base font-medium text-navy">{label}</span>
     </div>
   );
 }

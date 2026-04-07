@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Facebook, Menu, MessageCircle, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import logo from '../../logo.png';
 
 const NAV_ITEMS = [
@@ -11,21 +11,59 @@ const NAV_ITEMS = [
   { label: 'Trial Lesson', id: 'trial-lesson' },
 ] as const;
 
+const SECTION_ENTER_VIEWPORT_BUFFER_PX = 0;
+const NAV_TARGET_REACHED_THRESHOLD_PX = 24;
+const NAV_CLICK_LOCK_MS = 1200;
+
 type NavItemId = (typeof NAV_ITEMS)[number]['id'];
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<NavItemId>('home');
+  const topBarRef = useRef<HTMLDivElement>(null);
+  const pendingNavTargetRef = useRef<NavItemId | null>(null);
+  const pendingNavTargetTimeoutRef = useRef<number | null>(null);
+
+  const clearPendingNavTarget = () => {
+    if (pendingNavTargetTimeoutRef.current !== null) {
+      window.clearTimeout(pendingNavTargetTimeoutRef.current);
+      pendingNavTargetTimeoutRef.current = null;
+    }
+
+    pendingNavTargetRef.current = null;
+  };
+
+  useEffect(() => {
+    return () => {
+      if (pendingNavTargetTimeoutRef.current !== null) {
+        window.clearTimeout(pendingNavTargetTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const updateHeaderHeightVar = () => {
+      const headerHeight = topBarRef.current?.offsetHeight ?? 96;
+      document.documentElement.style.setProperty('--navbar-height', `${headerHeight}px`);
+    };
+
+    updateHeaderHeightVar();
+    window.addEventListener('resize', updateHeaderHeightVar);
+
+    return () => {
+      window.removeEventListener('resize', updateHeaderHeightVar);
+    };
+  }, []);
 
   useEffect(() => {
     const getHeaderOffset = () => {
-      const header = document.querySelector('header');
-      const height = header instanceof HTMLElement ? header.offsetHeight : 96;
-      return height + 24;
+      const height = topBarRef.current?.offsetHeight ?? 96;
+      return height + 12;
     };
 
     const resolveActiveSection = (): NavItemId => {
       const navOffset = getHeaderOffset();
+      const viewportBottom = window.innerHeight || document.documentElement.clientHeight;
       let currentSection: NavItemId = NAV_ITEMS[0].id;
 
       for (const item of NAV_ITEMS) {
@@ -34,9 +72,15 @@ export default function Navbar() {
           continue;
         }
 
-        if (section.getBoundingClientRect().top - navOffset <= 0) {
+        const rect = section.getBoundingClientRect();
+        const hasEnteredViewport = rect.top <= viewportBottom - SECTION_ENTER_VIEWPORT_BUFFER_PX;
+        const isNotPastHeader = rect.bottom > navOffset;
+
+        if (hasEnteredViewport && isNotPastHeader) {
           currentSection = item.id;
-        } else {
+        }
+
+        if (rect.top > viewportBottom) {
           break;
         }
       }
@@ -45,6 +89,25 @@ export default function Navbar() {
     };
 
     const updateActiveSection = () => {
+      const pendingTarget = pendingNavTargetRef.current;
+
+      if (pendingTarget) {
+        const pendingSection = document.getElementById(pendingTarget);
+        if (!pendingSection) {
+          clearPendingNavTarget();
+        } else {
+          const targetDistance = pendingSection.getBoundingClientRect().top - getHeaderOffset();
+          if (Math.abs(targetDistance) <= NAV_TARGET_REACHED_THRESHOLD_PX) {
+            clearPendingNavTarget();
+          }
+        }
+
+        if (pendingNavTargetRef.current) {
+          setActiveTab((previous) => (previous === pendingTarget ? previous : pendingTarget));
+          return;
+        }
+      }
+
       const current = resolveActiveSection();
       setActiveTab((previous) => (previous === current ? previous : current));
     };
@@ -62,7 +125,8 @@ export default function Navbar() {
       });
     };
 
-    updateActiveSection();
+    const initialSection = resolveActiveSection();
+    setActiveTab((previous) => (previous === initialSection ? previous : initialSection));
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleScroll);
 
@@ -72,10 +136,54 @@ export default function Navbar() {
     };
   }, []);
 
+  const scrollToSection = (id: NavItemId) => {
+    const section = document.getElementById(id);
+    if (!section) {
+      return;
+    }
+
+    const headerHeight = topBarRef.current?.offsetHeight ?? 96;
+    const targetY = section.getBoundingClientRect().top + window.scrollY - (headerHeight + 12);
+
+    window.scrollTo({
+      top: Math.max(targetY, 0),
+      behavior: 'smooth',
+    });
+  };
+
+  const handleNavClick = (event: React.MouseEvent<HTMLAnchorElement>, id: NavItemId) => {
+    event.preventDefault();
+    setActiveTab(id);
+
+    pendingNavTargetRef.current = id;
+    if (pendingNavTargetTimeoutRef.current !== null) {
+      window.clearTimeout(pendingNavTargetTimeoutRef.current);
+    }
+
+    pendingNavTargetTimeoutRef.current = window.setTimeout(() => {
+      pendingNavTargetRef.current = null;
+      pendingNavTargetTimeoutRef.current = null;
+    }, NAV_CLICK_LOCK_MS);
+
+    if (window.location.hash !== `#${id}`) {
+      window.history.replaceState(null, '', `#${id}`);
+    }
+
+    if (isOpen) {
+      setIsOpen(false);
+      window.setTimeout(() => {
+        scrollToSection(id);
+      }, 0);
+      return;
+    }
+
+    scrollToSection(id);
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 bg-white z-50 border-b border-gray-100">
       <div className="w-full px-4 sm:px-6 md:px-8">
-        <div className="flex justify-between items-center h-20 sm:h-24">
+        <div ref={topBarRef} className="flex justify-between items-center h-20 sm:h-24">
           <div className="flex-shrink-0 flex items-center gap-3 cursor-pointer">
             <img src={logo} alt="Teachers College Logo" className="w-10 h-10 sm:w-12 sm:h-12 object-contain" />
             <span className="font-extrabold text-lg sm:text-xl lg:text-2xl tracking-tight text-navy">Teachers College</span>
@@ -86,7 +194,7 @@ export default function Navbar() {
               <a
                 key={item.id}
                 href={`#${item.id}`}
-                onClick={() => setActiveTab(item.id)}
+                onClick={(event) => handleNavClick(event, item.id)}
                 className={`px-4 2xl:px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-150 ${
                   activeTab === item.id
                     ? 'bg-white text-navy shadow-sm'
@@ -140,10 +248,7 @@ export default function Navbar() {
               <a
                 key={item.id}
                 href={`#${item.id}`}
-                onClick={() => {
-                  setActiveTab(item.id);
-                  setIsOpen(false);
-                }}
+                onClick={(event) => handleNavClick(event, item.id)}
                 className={`block px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-150 ${
                   activeTab === item.id
                     ? 'bg-white text-navy shadow-sm'

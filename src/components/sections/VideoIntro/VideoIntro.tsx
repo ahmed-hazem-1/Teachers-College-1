@@ -9,11 +9,7 @@ export default function VideoIntro() {
         <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
             <SectionBadge
-              icon={
-                <div className="w-6 h-6 bg-red rounded-full flex items-center justify-center">
-                  <Play size={12} className="text-navy ml-0.5" />
-                </div>
-              }
+              icon={<Play size={14} />}
               label="Introduction"
             />
           </motion.div>
