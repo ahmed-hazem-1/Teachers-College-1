@@ -6,7 +6,11 @@ export default function CTA() {
     <section id="trial-lesson" className="relative py-16 md:py-24 bg-navy text-white overflow-hidden">
       <div className="absolute top-0 left-0 w-64 h-64 bg-red/20 rounded-full mix-blend-screen filter blur-3xl opacity-50 -translate-x-1/2 -translate-y-1/2"></div>
       <div className="absolute bottom-0 right-0 w-80 h-80 bg-blue-500/20 rounded-full mix-blend-screen filter blur-3xl opacity-50 translate-x-1/3 translate-y-1/3"></div>
-      <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:30px_30px]"></div>
+      <div className="cta-starfield" aria-hidden="true">
+        <div className="cta-stars-layer cta-stars-far"></div>
+        <div className="cta-stars-layer cta-stars-mid"></div>
+        <div className="cta-stars-layer cta-stars-near"></div>
+      </div>
 
       <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
         <motion.h2
